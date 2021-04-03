@@ -12,8 +12,28 @@ public class Date {
     private int month;
     private int year;
 
-    public Date(int day, int month, int year) {
+    public Date(final int day, final int month, final int year) {
         this.setDay(day).setMonth(month).setYear(year);
+    }
+
+    public static Date getEasterDate(final int year) {
+        // Eulersche equation
+        int a = year % 19;
+        int b = year % 4;
+        int c = year % 7;
+        int k = year / 100;
+        int p = (8 * k + 13) / 25;
+        int q = k / 4;
+        int M = (15 + k - p - q) % 30;
+        int d = (19 * a + M) % 30;
+        int N = (4 + k - q) % 7;
+        int e = (2 * b + 4 * c + 6 * d + N) % 7;
+        int daysEaster = (22 + d + e); // days in March, 32th March => 1st Aprilyear
+        if (daysEaster <= 31) {
+            return new Date(daysEaster, 3, year);
+        } else {
+            return new Date(daysEaster - 31, 4, year);
+        }
     }
 
     public boolean isUltimo() {
@@ -29,7 +49,7 @@ public class Date {
     }
 
     public boolean isHoliday() {
-        return isFixedHoliday() || isBirthday();
+        return this.isFixedHoliday() || this.isBirthday() || this.isEaster();
     }
 
     public boolean isBirthday() {
@@ -37,29 +57,31 @@ public class Date {
     }
 
     public boolean isEaster() {
-
-        // Eulersche equation
-        int a = this.getYear() % 19;
-        int b = this.getYear() % 4;
-        int c = this.getYear() % 7;
-        int k = this.getYear() / 100;
-        int p = (8 * k + 13) / 25;
-        int q = k / 4;
-        int M = (15 + k - p - q) / 30;
-        int d = (19 * a + M) % 30;
-        int N = (4 + k - q) % 7;
-        int e = (2 * b + 4 * c + 6 * d + N) % 7;
-        int daysEastern = (22 + d + e); // days in March, 32th March => 1st April
-        if (d == 29 && e == 6) {
-            daysEastern = 50;
-        } else if (d == 28 && e == 6 && a > 10) {
-            daysEastern = 49;
-        }
-
-        if (daysEastern <= 31 && this.getMonth() == 3 && this.getDay() == daysEastern) {
-            return true;
-        } else return daysEastern > 31 && this.getMonth() == 4 && this.getDay() - 31 == daysEastern;
+        return this.equals(getEasterDate(this.getYear()));
     }
+
+    public boolean isPentecost() {
+        Date easter = getEasterDate(this.getYear());
+        int day = easter.getDay() + 49;
+        int month = easter.getMonth();
+        while (day > (longMonths.contains(month) ? 31 : 30)) {
+            day -= longMonths.contains(month) ? 31 : 30;
+            month++;
+        }
+        return this.getDay() == day && this.getMonth() == month;
+    }
+
+    public boolean isAscension() {
+        Date easter = getEasterDate(this.getYear());
+        int day = easter.getDay() + 39;
+        int month = easter.getMonth();
+        while (day > (longMonths.contains(month) ? 31 : 30)) {
+            day -= longMonths.contains(month) ? 31 : 30;
+            month++;
+        }
+        return this.getDay() == day && this.getMonth() == month;
+    }
+
 
     public boolean isFixedHoliday() {
 
@@ -103,7 +125,7 @@ public class Date {
         return month;
     }
 
-    public Date setMonth(int month) {
+    public final Date setMonth(int month) {
         if (month > 0 && month <= 12) {
             this.month = month;
         } else {
@@ -116,7 +138,7 @@ public class Date {
         return year;
     }
 
-    public Date setYear(int year) {
+    public final Date setYear(int year) {
         if (year > 0) {
             this.year = year;
         } else {
@@ -125,16 +147,25 @@ public class Date {
         return this;
     }
 
+
     public int getDay() {
         return day;
     }
 
-    public Date setDay(int day) {
+    public final Date setDay(int day) {
         if (day > 0 && day <= 31) {
             this.day = day;
         } else {
             throw new IllegalArgumentException("Choose Day between 1 and 31");
         }
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Date)) return false;
+        Date date = (Date) o;
+        return getDay() == date.getDay() && getMonth() == date.getMonth() && getYear() == date.getYear();
     }
 }
