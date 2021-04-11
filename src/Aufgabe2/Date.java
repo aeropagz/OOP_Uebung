@@ -2,6 +2,7 @@ package Aufgabe2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Date {
     private static final List<Integer> longMonths = Arrays.asList(1, 3, 5, 7, 8, 10, 12);
@@ -13,7 +14,11 @@ public class Date {
     private int year;
 
     public Date(final int day, final int month, final int year) {
-        this.setDay(day).setMonth(month).setYear(year);
+        this.setMonth(month).setYear(year).setDay(day);
+    }
+
+    public Date(final Date date){
+        this(date.getDay(), date.getMonth(), date.getYear());
     }
 
     public static Date getEasterDate(final int year) {
@@ -154,8 +159,10 @@ public class Date {
 
     public final Date setDay(int day) {
         if (day > 0 && day <= 31) {
-            this.day = day;
-        } else {
+            if(!(this.getMonth() == 2 && ((day <=29 && this.isLeapYear()) || (!this.isLeapYear() && day <=28))))
+                this.day = day;
+        } else
+            {
             throw new IllegalArgumentException("Choose Day between 1 and 31");
         }
         return this;
@@ -167,5 +174,10 @@ public class Date {
         if (!(o instanceof Date)) return false;
         Date date = (Date) o;
         return getDay() == date.getDay() && getMonth() == date.getMonth() && getYear() == date.getYear();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDay(), getMonth(), getYear());
     }
 }
