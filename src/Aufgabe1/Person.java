@@ -50,13 +50,33 @@ public class Person {
         return Math.min(Math.max(value, min), max);
     }
 
+    private static boolean insertToArray(final Person[] personArray, final Person person) {
+        boolean inserted = false;
+        for (int i = 0; i < personArray.length; i++) {
+            if (personArray[i] == null) {
+                personArray[i] = person;
+                inserted = true;
+                break;
+            }
+        }
+        return inserted;
+    }
+
     public final Person addParent(final Person parent) throws Exception {
-        if (this.getParents()[0] == null) {
-            this.getParents()[0] = parent;
-        } else if (this.getParents()[1] == null) {
-            this.getParents()[1] = parent;
-        } else {
-            throw new Exception("Already 2 parents");
+        if (!insertToArray(this.getParents(), parent)) {
+            throw new Exception("(Grand-)Parents already full");
+        }
+        return this;
+    }
+
+    public void addParents(final Person parent1, final Person parent2) throws Exception {
+        this.addParent(parent1);
+        this.addParent(parent2);
+    }
+
+    public final Person addGrandparent(final Person grandparent) throws Exception {
+        if (!insertToArray(this.getGrandparents(), grandparent)) {
+            throw new Exception("Grandparents already full");
         }
         return this;
     }
@@ -66,10 +86,6 @@ public class Person {
         return this;
     }
 
-    public void addParents(final Person parent1, final Person parent2) throws Exception {
-        this.addParent(parent1);
-        this.addParent(parent2);
-    }
 
     public boolean isHomeless() {
         return this.getAddress() == null;
@@ -81,8 +97,8 @@ public class Person {
         return this;
     }
 
-    public final Person printAddressHistory(){
-        for(Map.Entry<Date, Adresse> entry : this.getAddressHistory().entrySet()){
+    public final Person printAddressHistory() {
+        for (Map.Entry<Date, Adresse> entry : this.getAddressHistory().entrySet()) {
             System.out.println(entry.getKey() + " - " + entry.getValue());
         }
         return this;
