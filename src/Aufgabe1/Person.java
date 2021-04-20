@@ -156,6 +156,17 @@ public class Person {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "Person:\n" +
+                "name='" + name + '\'' +
+                ",\nfirstname='" + firstname + '\'' +
+                ",\nweight=" + weight +
+                ",\ngeburtsdatum=" + geburtsdatum +
+                ",\nalive=" + alive;
+
+    }
+
     public Date getLastMovement() {
         return lastMovement;
     }
